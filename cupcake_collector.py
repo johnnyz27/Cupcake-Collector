@@ -21,8 +21,9 @@ cupcake_image = pygame.transform.scale(cupcake_image, (30, 30))
 
 platforms = [
     pygame.Rect(0, HEIGHT - 30, WIDTH, 30),
-    pygame.Rect(200, HEIGHT - 150, 200, 20),
+    pygame.Rect(150, HEIGHT - 150, 200, 20),
     pygame.Rect(460, HEIGHT - 250, 200, 20),
+    pygame.Rect(100, HEIGHT - 450, 200, 20),
     pygame.Rect(200, HEIGHT - 300, 100, 20),
     pygame.Rect(600, HEIGHT - 400, 150, 20)
 ]
@@ -60,12 +61,24 @@ async def main():
         player_dy += gravity
         player_rect.y += int(player_dy)
 
+        # Window collisions
+        if player_rect.left < 0:
+            player_rect.left = 0
+        if player_rect.right > WIDTH:
+            player_rect.right = WIDTH
+        if player_rect.top < 0:
+            player_rect.top = 0
+            player_dy = 0
+        
         # Platform collisions
         for platform in platforms:
             if player_rect.colliderect(platform) and player_dy >= 0:
                 player_rect.bottom = platform.top
                 player_dy = 0
                 jumps_left = max_jumps
+            elif player_dy < 0 and player_rect.colliderect(platform):
+                player_rect.top = platform.bottom
+                player_dy = 0
 
         # Cupcake collisions
         for cupcake in cupcakes[:]:
